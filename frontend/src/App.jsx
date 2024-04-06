@@ -28,7 +28,7 @@ function App() {
     }
   }, [user]);
 
-  console.log(onlineUser);
+  // console.log(onlineUser);
   return (
     <Suspense fallback={<LoadingScreen />}>
       <Routes>

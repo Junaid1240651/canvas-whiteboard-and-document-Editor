@@ -23,10 +23,12 @@ import useGetUserData from "../hooks/useGetUserData";
 const CreateFile = ({
   newFile,
   renameFile,
-
+  grantAccess,
   isModalOpen,
   setIsModalOpen,
 }) => {
+  console.log(grantAccess);
+
   const [fileName, setFileName] = useState(renameFile?.fileName);
   const { isLoading, setLoading } = useLoading();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -74,6 +76,24 @@ const CreateFile = ({
     }
   };
 
+  const grantAccessHandler = () => {
+    if (isLoading) return;
+    setLoading(true);
+    axios
+      .post(`/api/userData/grantAccess/${grantAccess}`, {
+        email: fileName,
+      })
+      .then((res) => {
+        showToast("Success", res.data.message, "success");
+        closeModal();
+      })
+      .catch((error) => {
+        showToast("Error", error.response.data.message, "error");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
   useEffect(() => {
     if (isModalOpen) {
       onOpen();
@@ -96,7 +116,11 @@ const CreateFile = ({
     >
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>Enter File Name</ModalHeader>
+        <ModalHeader>
+          {grantAccess
+            ? "Enter Email  To Give Grant Access"
+            : "Enter File Name"}
+        </ModalHeader>
         <ModalCloseButton />
         <ModalBody>
           <Input
@@ -108,9 +132,15 @@ const CreateFile = ({
           <Button onClick={closeModal}>Close</Button>
           <Button
             isLoading={isLoading}
-            onClick={newFile ? createFile : updateFile}
+            onClick={
+              newFile
+                ? createFile
+                : grantAccess
+                ? grantAccessHandler
+                : updateFile
+            }
           >
-            {newFile ? " Create File" : "Update File"}
+            {newFile ? "Create File" : grantAccess ? "Submit" : "Update File"}
           </Button>
         </ModalFooter>
       </ModalContent>

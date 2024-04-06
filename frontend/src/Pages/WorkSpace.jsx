@@ -10,6 +10,7 @@ import {
   Divider,
   useColorMode,
 } from "@chakra-ui/react";
+import { IoSadOutline } from "react-icons/io5";
 import React, { Suspense, lazy, useEffect, useState } from "react";
 import useShowToast from "../hooks/useShowToast";
 import axios from "axios";
@@ -29,14 +30,36 @@ const Workspace = () => {
   const [whiteBoardData, setWhiteBoardData] = useState();
   const { isLoading, setLoading } = useLoading();
   const user = useSelector((state) => state.auth.userInfo);
-
+  const [fileData, setFileData] = useState();
   const dispatch = useDispatch();
   const [screenType, setScreenType] = useState("both");
   const useToast = useShowToast();
   const { fileId } = useParams();
-  const { getFileName, fileName } = useGetFileName();
+  const getFileData = async () => {
+    try {
+      // Set loading state to true to indicate that data is being fetched
+      setLoading(true);
+
+      // Make API request to fetch file data
+      const res = await axios.get(`/api/userData/file/${fileId}`);
+      // Check if the response contains data
+      if (res.data) {
+        // If data is received, update the file data state
+        setFileData(res.data);
+      }
+    } catch (error) {
+      useToast("Error", error.response.data.message, "error");
+
+      // If an error occurs during the API request, log the error and display a toast message
+    } finally {
+      // Set loading state to false once the request is complete, regardless of success or failure
+      setLoading(false);
+    }
+  };
 
   const onSaveDocument = async () => {
+    console.log(documentData);
+
     if (
       isLoading &&
       screenType === "both" &&
@@ -45,17 +68,16 @@ const Workspace = () => {
     )
       return;
     // alert("save document");
-
     setLoading(true);
-
     try {
       const res = await axios.post(`/api/userData/saveDocument/${fileId}`, {
         document: documentData?.document,
         canvas: whiteBoardData?.canvasData,
       });
-
       useToast("Success", res.data.message, "success");
     } catch (error) {
+      setFileData(null);
+
       useToast("Error", error.response.data.message, "error");
     } finally {
       setLoading(false);
@@ -74,6 +96,7 @@ const Workspace = () => {
   };
 
   function getDocData(document) {
+    console.log(document);
     setDocumentData((prevData) => ({ ...prevData, document }));
   }
   function getCanvasData(canvasData) {
@@ -81,16 +104,29 @@ const Workspace = () => {
   }
 
   useEffect(() => {
-    (document || whiteBoardData) && onSaveDocument();
-  }, [document, whiteBoardData]);
+    if (screenType === "both") {
+      document && whiteBoardData && onSaveDocument();
+    } else {
+      onSaveDocument();
+    }
+  }, [documentData, whiteBoardData]);
 
   useEffect(() => {
-    getFileName(fileId);
+    getFileData();
   }, [fileId]);
+  console.log(whiteBoardData);
 
+  if (!fileData?.canvas && !fileData?.document)
+    return fileData === null ? (
+      <Text className=" text-2xl flex justify-center   h-[100vh] items-center w-full">
+        You Dont Have Access of This file or Invalid Url 🥺
+      </Text>
+    ) : (
+      <LoadingScreen />
+    );
   return (
     <>
-      {fileName ? (
+      {true ? (
         <Suspense fallback={<LoadingScreen />}>
           <Box
             height={"auto"}
@@ -104,7 +140,7 @@ const Workspace = () => {
             >
               <HStack spacing={4} alignItems={"center"}>
                 <Avatar cursor={"pointer"} size={"sm"} src={user?.profilePic} />
-                <Text cursor={"pointer"}>{fileName?.[0].fileName}</Text>
+                <Text cursor={"pointer"}>{fileData?.fileName}</Text>
               </HStack>
               <HStack spacing={0} alignItems={"center"}>
                 <Text
@@ -161,13 +197,20 @@ const Workspace = () => {
                     : "hidden"
                 }`}
               >
-                <Document setDocData={getDocData} />
+                <Document
+                  fileData={fileData?.document}
+                  setDocData={getDocData}
+                />
               </div>
               {screenType === "both" && (
                 <Divider width={0.5} height={"100%"} className="bg-slate-400" />
               )}
               <React.Fragment>
-                <Canvas setCanvasData={getCanvasData} />
+                <Canvas
+                  setFileData={setFileData}
+                  fileData={fileData?.canvas}
+                  setCanvasData={getCanvasData}
+                />
               </React.Fragment>
             </Flex>
           </Box>

@@ -40,9 +40,11 @@ const rawDocument = {
   ],
   version: "2.8.1",
 };
-const Document = ({ setDocData }) => {
+const Document = ({ setDocData, fileData }) => {
   const editorRef = useRef(null);
-  const [document, setDocument] = useState();
+  const [document, setDocument] = useState(
+    fileData[0] ? fileData[0] : rawDocument
+  );
   const { isLoading, setLoading } = useLoading();
   const { fileId } = useParams();
   const [hasNewChanges, setHasNewChanges] = useState(false);
@@ -114,35 +116,15 @@ const Document = ({ setDocData }) => {
   const onSaveDocument = async () => {
     if (editorRef.current) {
       const saveData = await editorRef.current.save();
+      console.log(saveData);
       setDocData([saveData]);
     }
   };
 
-  const getDocument = async () => {
-    if (isLoading) return;
-    setLoading(true);
-    try {
-      const res = await axios.get(`/api/userData/document/${fileId}`);
-
-      if (res.data) {
-        setDocument(res.data);
-      } else {
-        setDocument(rawDocument);
-      }
-    } catch (error) {
-      useToast("Error", error.response.data.message, "error");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    getDocument();
-  }, [fileId]);
-
   useEffect(() => {
     saveDocClick && onSaveDocument();
     saveDocClick && dispatch(setSaveDocClick(false));
+    console.log("fgsdfg");
   }, [saveDocClick]);
 
   useEffect(() => {
@@ -160,25 +142,13 @@ const Document = ({ setDocData }) => {
   }, [document]);
 
   useEffect(() => {
-    const onSaveDocument = async () => {
-      if (editorRef.current) {
-        const saveData = await editorRef.current.save();
-        setHasNewChanges(true); // Set flag to true when new changes are made locally
-        setDocument(saveData);
-      }
-    };
-
-    onSaveDocument();
-  }, [document]);
-
-  useEffect(() => {
     if (hasNewChanges && socket) {
       const abc = async () => {
         const saveData = await editorRef.current.save();
-
-        socket.emit("canvas", {
+        socket.emit("document", {
           document: saveData,
           _id: user?._id,
+          fileId: fileId,
         });
         setHasNewChanges(false); // Reset the flag after emitting data
       };
@@ -187,11 +157,10 @@ const Document = ({ setDocData }) => {
   }, [hasNewChanges, socket]);
 
   useEffect(() => {
-    socket?.on("canvas", (message) => {
-      // console.log(message.document);
+    socket?.on("document", (message) => {
+      console.log(message.document);
       if (user?._id !== message._id) {
         const receivedDocumentData = message.document;
-        const currentDocumentData = document;
 
         // If the received data is different from the current state, update the state
         if (JSON.stringify(receivedDocumentData) !== JSON.stringify(document)) {
@@ -202,10 +171,9 @@ const Document = ({ setDocData }) => {
     });
 
     return () => {
-      socket.off("canvas"); // Clean up socket listener on unmount
+      socket.off("document"); // Clean up socket listener on unmount
     };
   }, [socket]);
-  console.log(document);
   return (
     <div
       className={`w-[100%] ${

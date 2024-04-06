@@ -1,25 +1,31 @@
 const UserData = require("../models/userDataModel.js");
 const cloudinary = require("cloudinary").v2;
 const mongoose = require("mongoose");
+const User = require("../models/userModel.js");
 
 const saveDocument = async (req, res) => {
   const { _id } = req.user;
   const { document, canvas } = req.body;
   const { fileId } = req.params;
-
+  console.log("abt");
+  console.log(canvas?.whiteBoardData);
   try {
-    var userData = await UserData.findOne({ userId: _id });
-    if (!userData) {
-      return res.status(400).json({ message: "User Not Found" });
-    }
-
-    if (!document && !canvas) {
-      return res.status(400).json({ message: "No data provided" });
-    }
-    console.log(fileId);
-    const fileExistIndex = userData.file.findIndex(
+    let userData = await UserData.findOne({ userId: _id });
+    let fileExistIndex = userData?.file?.findIndex(
       (file) => file._id == fileId
     );
+    if (fileExistIndex === -1) {
+      userData = await UserData.findOne({ "whiteListUser.userId": _id });
+      if (!userData) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      fileExistIndex = userData.file.findIndex((file) => file._id == fileId);
+    }
+    if (!document && !canvas) {
+      return;
+      res.status(400).json({ message: "No data provided" });
+    }
+
     if (fileExistIndex === -1) {
       return res.status(400).json({ message: "File Not Found" });
     }
@@ -35,13 +41,13 @@ const saveDocument = async (req, res) => {
           { imageData: {}, whiteBoardData: {} },
         ];
       }
-      console.time();
-      // await deleteCloudinaryImages(canvasData);
-      console.timeEnd();
-      console.time();
+      // console.time();
+      // // await deleteCloudinaryImages(canvasData);
+      // console.timeEnd();
+      // console.time();
 
       const updatedImageDataArray = await uploadImagesToCloudinary(canvas);
-      console.timeEnd();
+      // console.timeEnd();
 
       updatedImageDataArray.forEach((item) => {
         if (item && item.id && item.dataURL) {
@@ -63,9 +69,10 @@ const saveDocument = async (req, res) => {
     saveDocument2(
       userData.file[fileExistIndex].canvas[0],
       fileExistIndex,
-      _id,
+      userData._id,
       document
     );
+    console.log(userData._id);
     res.status(200).json({ message: "Document saved successfully", userData });
   } catch (error) {
     console.error("Error in saving document:", error);
@@ -76,7 +83,7 @@ const saveDocument = async (req, res) => {
 const saveDocument2 = async (userData, fileExistIndex, _id, document) => {
   try {
     // Assuming UserData is the Mongoose model representing user data
-    let user = await UserData.findOne({ userId: _id });
+    let user = await UserData.findOne({ _id });
 
     // Assuming fileExistIndex is the index of the file to be updated
     user.file[fileExistIndex].canvas[0] = userData;
@@ -84,8 +91,11 @@ const saveDocument2 = async (userData, fileExistIndex, _id, document) => {
 
     // Save the updated user data
     await user.save();
+    // console.log(user.file[fileExistIndex].document[0].blocks.length);
+
     return;
   } catch (error) {
+    console.log("Error in saving document:", error);
     return error;
   }
 };
@@ -173,25 +183,6 @@ const createTeam = async (req, res) => {
   }
 };
 
-const getDocument = async (req, res) => {
-  try {
-    const { _id } = req.user;
-    const { fileId } = req.params;
-
-    const user = await findUserData(_id, res);
-
-    if (user) {
-      let file = user.file.findIndex((file) => file._id == fileId);
-
-      res.status(200).json(user.file[file].document[0]);
-    } else {
-      res.status(400).json({ message: "No file found" });
-    }
-  } catch (error) {
-    res.status(500).json({ message: "Error in fetching file" });
-  }
-};
-
 const createFile = async (req, res) => {
   const { _id } = req.user;
   const { fileName, teamId } = req.body;
@@ -228,70 +219,47 @@ const createFile = async (req, res) => {
   }
 };
 
-// const saveCanvas = async (req, res) => {
-//   const { _id } = req.user;
-//   const { canvas } = req.body;
-//   const { fileId } = req.params;
-
-//   try {
-//     let userData = await getUserData(_id, res);
-
-//     if (!userData) {
-//       return res.status(400).json({ message: "User Not Found" });
-//     }
-
-//     let file = userData.file.find((file) => file._id == fileId);
-
-//     if (!file) {
-//       return res.status(400).json({ message: "File Not Found" });
-//     }
-
-//     file.canvas[0] = canvas;
-
-//     await retry(() => userData.save());
-
-//     res.status(200).json({ message: "Canvas saved successfully" });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: "Error in saving canvas" });
-//   }
-// };
-
-// const retry = async (operation, maxAttempts = 3, delay = 1000) => {
-//   let attempts = 0;
-//   while (attempts < maxAttempts) {
-//     try {
-//       await operation();
-//       return; // Operation successful, exit the loop
-//     } catch (error) {
-//       if (error.name === "VersionError" && attempts < maxAttempts - 1) {
-//         // Increment attempts and wait before retrying
-//         attempts++;
-//         await new Promise((resolve) => setTimeout(resolve, delay));
-//       } else {
-//         throw error; // Throw error if it's not a VersionError or maxAttempts reached
-//       }
-//     }
-//   }
-//   throw new Error("Operation failed after multiple attempts");
-// };
-
-const getCanvas = async (req, res) => {
+const getFileData = async (req, res) => {
   try {
     const { _id } = req.user;
     const { fileId } = req.params;
-    const user = await findUserData(_id, res);
 
-    if (user) {
-      let fileExistIndex = user.file.findIndex((file) => file._id == fileId);
-      if (fileExistIndex !== -1) {
-        res.status(200).json(user.file[fileExistIndex].canvas);
+    // Find the user data
+    let user = await UserData.findOne({ userId: _id });
+    if (!user) {
+      user = new UserData({ userId: _id });
+      await user.save();
+      // return res.status(404).json({ message: "User not found" });
+    }
+
+    // Find the file index in the user's files
+    const fileIndex = await user.file.findIndex((file) => file._id == fileId);
+    if (fileIndex === -1) {
+      // If file not found in user's files, check whitelist for access
+      const checkGrantAccess = await UserData.findOne({
+        "whiteListUser.userId": _id,
+      });
+      if (!checkGrantAccess) {
+        return res.status(403).json({ message: "Access denied" });
       }
+
+      // Find the file in the whitelist user's files
+      const grantAccessFile = checkGrantAccess.file.find(
+        (file) => file._id == fileId
+      );
+      if (!grantAccessFile) {
+        return res.status(404).json({ message: "You Are Not Authraise" });
+      }
+
+      // Return the file data if found
+      return res.status(200).json(grantAccessFile);
     } else {
-      res.status(400).json({ message: "No file found" });
+      // Return the file data from the user's files
+      return res.status(200).json(user.file[fileIndex]);
     }
   } catch (error) {
-    res.status(500).json({ message: "Error in fetching Canvas" });
+    console.error("Error in fetching file data:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -410,25 +378,6 @@ const findUserData = async (_id, res) => {
   return userData;
 };
 
-const getFileName = async (req, res) => {
-  try {
-    const { _id } = req.user;
-    const { teamId } = req.params;
-    const { fileId } = req.query;
-
-    const user = await UserData.findOne({ userId: _id });
-
-    if (user && fileId) {
-      let file = user.file.filter((file) => file._id == fileId);
-      res.status(200).json(file);
-    } else if (user && teamId) {
-      let file = user.file.filter((file) => file.teamId == teamId);
-      res.status(200).json(file);
-    }
-  } catch (error) {
-    res.status(500).json({ message: "Error in fetching file" });
-  }
-};
 const unArchive = async (req, res) => {
   const { _id } = req.user;
   const { fileId } = req.params;
@@ -449,6 +398,56 @@ const unArchive = async (req, res) => {
     res.status(500).json({ message: "Error in unarchiving file" });
   }
 };
+const grantAccess = async (req, res) => {
+  try {
+    const { _id } = req.user;
+    const { fileId } = req.params;
+    const { email } = req.body;
+
+    // Validate email format
+    if (!email) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
+
+    // Find the user's data
+    const userData = await UserData.findOne({ userId: _id });
+    if (!userData) {
+      return res.status(404).json({ message: "User data not found" });
+    }
+
+    // Find the file by its ID
+    const file = userData.file.find((file) => file._id == fileId);
+    if (!file) {
+      return res.status(404).json({ message: "File not found" });
+    }
+    if (!file.whiteListUser) {
+      file.whiteListUser = [];
+    }
+    // Find the user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    if (userData.whiteListUser.includes(user._id)) {
+      return res.status(200).json({ message: "Access already granted" });
+    }
+    // Grant access by adding the user's ID to the whiteListUser array of the file
+    userData.whiteListUser.push({ userId: user._id, fileId });
+
+    // Save the updated userData
+    await userData.save();
+
+    res.status(200).json({ message: "Access granted successfully" });
+  } catch (error) {
+    console.error("Error in granting access to file:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// // Function to validate email format
+// const isValidEmail = (email) => {
+//   // Implement your email validation logic here
+// };
 
 module.exports = {
   createFile,
@@ -456,11 +455,10 @@ module.exports = {
   unArchive,
   saveDocument,
   archiveFile,
-  getDocument,
   deleteFile,
-  getCanvas,
   updateFile,
   duplicateFile,
   getUserData,
-  getFileName,
+  getFileData,
+  grantAccess,
 };

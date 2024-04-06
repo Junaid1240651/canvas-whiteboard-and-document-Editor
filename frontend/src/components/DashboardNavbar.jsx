@@ -48,6 +48,7 @@ import { CgProfile } from "react-icons/cg";
 import useLogout from "../hooks/useLogout";
 const DashboardNavbar = ({}) => {
   const [renameFile, setRenameFile] = useState(null);
+  const [grantAccess, setGrantAccess] = useState(null);
   const user = useSelector((state) => state.auth.userInfo);
   const userData = useSelector((state) => state.user.userData);
   const logout = useLogout();
@@ -75,7 +76,7 @@ const DashboardNavbar = ({}) => {
     navigator.clipboard
       .writeText("http://localhost:3001/workspace/" + fileId)
       .then(() => {
-        showToast("Success", "Profile link copied", "success");
+        showToast("Success", "File link copied", "success");
       });
   };
   const duplicateFile = async (fileId) => {
@@ -353,6 +354,15 @@ const DashboardNavbar = ({}) => {
                         </MenuItem>
                         <MenuItem
                           onClick={() => {
+                            setIsModalOpen(true), setGrantAccess(file._id);
+                          }}
+                          icon={<IoIosLink size={18} />}
+                          command="⌘C"
+                        >
+                          Grant Access
+                        </MenuItem>
+                        <MenuItem
+                          onClick={() => {
                             setRenameFile(file);
                             setIsModalOpen(true);
                           }}
@@ -362,6 +372,7 @@ const DashboardNavbar = ({}) => {
                           Rename
                         </MenuItem>
                         <MenuItem
+                          onClick={() => copyURL(file._id)}
                           icon={<IoShareSocialOutline size={18} />}
                           command="⌘S"
                         >
@@ -407,6 +418,7 @@ const DashboardNavbar = ({}) => {
         )}
         {isModalOpen && (
           <CreateFile
+            grantAccess={grantAccess}
             renameFile={renameFile}
             isModalOpen={isModalOpen}
             setIsModalOpen={setIsModalOpen}

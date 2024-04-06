@@ -139,6 +139,7 @@ const SideNavBar = () => {
                   <AiOutlineTeam />
                   Create Team
                 </MenuItem>
+
                 <MenuItem gap={2} px={2} onClick={() => navigate("/profile")}>
                   <IoSettingsOutline gap={2} />
                   Settings

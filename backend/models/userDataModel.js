@@ -24,6 +24,12 @@ const userDataSchema = new mongoose.Schema(
     team: [teamNameSchema],
     file: [fileNameSchema],
     isArchive: Array,
+    whiteListUser: [
+      {
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        fileId: { type: mongoose.Schema.Types.ObjectId, ref: "File" },
+      },
+    ],
   },
   { timestamps: true }
 );
