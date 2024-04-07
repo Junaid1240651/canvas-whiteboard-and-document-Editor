@@ -8,7 +8,7 @@ const setupSocket = (userId, dispatch) => {
         userId: userId,
       },
     });
-console.log(socket)
+
     socket.on("connect", () => {
       dispatch(setSocket(socket));
     });
