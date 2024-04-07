@@ -25,17 +25,18 @@ const CreateFile = ({
   isModalOpen,
   setIsModalOpen,
 }) => {
-  console.log(grantAccess);
-
   const [fileName, setFileName] = useState(renameFile?.fileName);
   const { isLoading, setLoading } = useLoading();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const selectedTeam = useSelector((state) => state.team.selectedTeam);
   const showToast = useShowToast();
   const getUserData = useGetUserData();
-
   const createFile = async () => {
     if (isLoading) return;
+    if (selectedTeam?.team === undefined) {
+      alert("Please create a team first");
+      return;
+    }
     setLoading(true);
     try {
       const res = await axios.post("/api/userData/createFile", {
