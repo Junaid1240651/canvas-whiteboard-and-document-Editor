@@ -20,7 +20,7 @@ let previousDocument = null;
 
 io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId;
-
+  console.log(userId)
   const debounceEmitCanvas = _.debounce(({ document, canvas, _id, fileId }) => {
     // Emit the canvas event to all clients
     io.emit("canvas", { document, canvas, _id, fileId });
