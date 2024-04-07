@@ -6,7 +6,7 @@ const server = http.createServer(app);
 const _ = require("lodash");
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3001",
+    origin: "https://canvas-whiteboard-and-document-editor.onrender.com",
     methods: ["GET", "POST", "PUT", "DELETE"],
   },
 });
