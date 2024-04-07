@@ -3,12 +3,12 @@ import { setSocket } from "../redux/socketio";
 
 const setupSocket = (userId, dispatch) => {
   try {
-    const socket = io("http://localhost:3000", {
+    const socket = io("/", {
       query: {
         userId: userId,
       },
     });
-
+console.log(socket)
     socket.on("connect", () => {
       dispatch(setSocket(socket));
     });
