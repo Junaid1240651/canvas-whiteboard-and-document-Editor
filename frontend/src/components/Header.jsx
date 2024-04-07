@@ -13,7 +13,7 @@ const Header = () => {
       <div className="mx-auto flex h-16 max-w-screen-xl items-center gap-8 px-4 sm:px-6 lg:px-8">
         <a className="block text-teal-600" href="#">
           <span className="sr-only">Home</span>
-          <img className="w-[20%]" alt="logo" src="/logo.png" />
+          <img className="w-[20%]" alt="logo" src="/logo2.png" />
         </a>
 
         <div className="flex flex-1 items-center justify-end md:justify-between">
@@ -71,7 +71,7 @@ const Header = () => {
 
               <li>
                 <a
-                  className="text-white transition hover:text-gray-500/75"
+                  className="mr-2 text-white transition hover:text-gray-500/75"
                   href="#"
                 >
                   {" "}

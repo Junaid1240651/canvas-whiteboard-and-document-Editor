@@ -164,7 +164,7 @@ const Document = ({ setDocData, fileData }) => {
 
         // If the received data is different from the current state, update the state
         if (JSON.stringify(receivedDocumentData) !== JSON.stringify(document)) {
-          console.log("bimci");
+          // Update the document state with the filtered document data
           setDocument(receivedDocumentData);
         }
       }
@@ -182,7 +182,7 @@ const Document = ({ setDocData, fileData }) => {
     >
       {!isLoading && (
         <div
-          className={` ${colorMode === "light" ? "bg-slate-200" : " bg-dark"} `}
+          className={` ${colorMode === "light" ? "white" : " bg-dark"} `}
           id="editorjs"
         />
       )}

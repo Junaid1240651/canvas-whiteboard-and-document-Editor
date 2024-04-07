@@ -21,7 +21,6 @@ const Canvas = ({ setCanvasData, fileData }) => {
     fileData[0] ? fileData[0].imageData : null
   );
   const { colorMode } = useColorMode();
-  const { isLoading, setLoading } = useLoading();
   const socket = useSelector((state) => state.socketio.socket);
   const user = useSelector((state) => state.auth.userInfo);
   const [excalidrawAPI, setExcalidrawAPI] = useState(null);
@@ -55,7 +54,6 @@ const Canvas = ({ setCanvasData, fileData }) => {
     const sceneData = {
       elements: currentData.map((element) => element),
     };
-
     await excalidrawAPI.updateScene(sceneData);
 
     setIsRemoteChange(true);
@@ -73,6 +71,8 @@ const Canvas = ({ setCanvasData, fileData }) => {
         setIsRemoteChange(false);
 
         const receivedCanvasData = message.canvas;
+        const receivedFileData = message.fileData;
+        console.log(receivedFileData, "receivedFileData");
 
         if (
           JSON.stringify(receivedCanvasData) !==
@@ -90,61 +90,60 @@ const Canvas = ({ setCanvasData, fileData }) => {
 
     return () => {
       socket.off("canvas"); // Clean up socket listener on unmount
-      socket.off("change"); // Clean up socket listener on unmount
     };
   }, [socket]);
+  console.log(imageData);
   if (!fileData) return <LoadingScreen />;
   return (
     <>
-      {!isLoading && (
-        <Excalidraw
-          theme={theme}
-          initialData={{
-            elements: whiteBoardData,
-            appState: { viewBackgroundColor: "#1e20" },
-            files: files,
-          }}
-          excalidrawAPI={(api) => setExcalidrawAPI(api)}
-          isCollaborating={true}
-          onChange={(excalidrawElements, appState, files) => {
-            setWhiteBoardData2(excalidrawElements);
-            if (isRemoteChange === true) {
-              // Only emit changes if they are not caused by remote users
-              setTimeout(() => {
-                setImageData(files);
-                socket.emit("canvas", {
-                  canvas: excalidrawElements,
-                  _id: user?._id,
-                  fileId: fileId,
-                });
-              }, 100);
-            }
-          }}
-          UIOptions={{
-            canvasActions: {
-              saveToActiveFile: false,
-              loadScene: false,
-              export: false,
-              toggleTheme: false,
-            },
-          }}
-        >
-          <MainMenu>
-            <MainMenu.DefaultItems.ClearCanvas />
-            <MainMenu.DefaultItems.Help />
-            <MainMenu.DefaultItems.SaveAsImage />
-            <MainMenu.DefaultItems.ChangeCanvasBackground />
-          </MainMenu>
-          <WelcomeScreen>
-            <WelcomeScreen.Hints.MenuHint />
-            <WelcomeScreen.Hints.MenuHint />
-            <WelcomeScreen.Hints.ToolbarHint />
-            <WelcomeScreen.Center>
-              <WelcomeScreen.Center.MenuItemHelp />
-            </WelcomeScreen.Center>
-          </WelcomeScreen>
-        </Excalidraw>
-      )}
+      <Excalidraw
+        theme={theme}
+        initialData={{
+          elements: whiteBoardData,
+          appState: { viewBackgroundColor: "#1e20" },
+          files: files,
+        }}
+        excalidrawAPI={(api) => setExcalidrawAPI(api)}
+        isCollaborating={true}
+        onChange={(excalidrawElements, appState, files) => {
+          setWhiteBoardData2(excalidrawElements);
+          if (isRemoteChange === true) {
+            // Only emit changes if they are not caused by remote users
+            setTimeout(() => {
+              setImageData(files);
+              socket.emit("canvas", {
+                canvas: excalidrawElements,
+                fileData: files,
+                _id: user?._id,
+                fileId: fileId,
+              });
+            }, 200);
+          }
+        }}
+        UIOptions={{
+          canvasActions: {
+            saveToActiveFile: false,
+            loadScene: false,
+            export: false,
+            toggleTheme: false,
+          },
+        }}
+      >
+        <MainMenu>
+          <MainMenu.DefaultItems.ClearCanvas />
+          <MainMenu.DefaultItems.Help />
+          <MainMenu.DefaultItems.SaveAsImage />
+          <MainMenu.DefaultItems.ChangeCanvasBackground />
+        </MainMenu>
+        <WelcomeScreen>
+          <WelcomeScreen.Hints.MenuHint />
+          <WelcomeScreen.Hints.MenuHint />
+          <WelcomeScreen.Hints.ToolbarHint />
+          <WelcomeScreen.Center>
+            <WelcomeScreen.Center.MenuItemHelp />
+          </WelcomeScreen.Center>
+        </WelcomeScreen>
+      </Excalidraw>
     </>
   );
 };

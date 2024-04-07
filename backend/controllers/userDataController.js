@@ -17,7 +17,7 @@ const saveDocument = async (req, res) => {
     if (fileExistIndex === -1) {
       userData = await UserData.findOne({ "whiteListUser.userId": _id });
       if (!userData) {
-        return res.status(403).json({ message: "Access denied" });
+        return res.status(404).json({ message: "Access denied" });
       }
       fileExistIndex = userData.file.findIndex((file) => file._id == fileId);
     }

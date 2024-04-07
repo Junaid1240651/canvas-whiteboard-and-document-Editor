@@ -29,7 +29,6 @@ const UpdateProfilePage = () => {
     name: user.name,
     userName: user.userName,
     email: user.email,
-    bio: user.bio,
     profilePic: user.profilePic,
     password: "",
   });
@@ -125,16 +124,7 @@ const UpdateProfilePage = () => {
               value={inputs.email}
             />
           </FormControl>
-          <FormControl>
-            <FormLabel>Bio</FormLabel>
-            <Input
-              placeholder="Your Bio..."
-              _placeholder={{ color: "gray.500" }}
-              type="text"
-              onChange={(e) => setInputs({ ...inputs, bio: e.target.value })}
-              value={inputs.bio}
-            />
-          </FormControl>{" "}
+
           <FormControl>
             <FormLabel>Password</FormLabel>
             <Input

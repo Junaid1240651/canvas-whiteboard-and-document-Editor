@@ -181,7 +181,7 @@ const DashboardNavbar = ({}) => {
 
       setFile(fileName);
     } else if (selectedTeam.allFile === true) {
-      const fileName = userData?.file.filter(
+      const fileName = userData?.file?.filter(
         (file) => !userData.isArchive.includes(file._id)
       );
       setFile(fileName);
@@ -354,7 +354,9 @@ const DashboardNavbar = ({}) => {
                         </MenuItem>
                         <MenuItem
                           onClick={() => {
-                            setIsModalOpen(true), setGrantAccess(file._id);
+                            setIsModalOpen(true),
+                              setRenameFile(""),
+                              setGrantAccess(file._id);
                           }}
                           icon={<IoIosLink size={18} />}
                           command="⌘C"
@@ -365,6 +367,8 @@ const DashboardNavbar = ({}) => {
                           onClick={() => {
                             setRenameFile(file);
                             setIsModalOpen(true);
+
+                            setGrantAccess();
                           }}
                           icon={<MdDriveFileRenameOutline size={18} />}
                           command="⌘R"

@@ -1,4 +1,4 @@
-import { Button, Image, Input } from "@chakra-ui/react";
+import { Button, Image, Input, useColorMode } from "@chakra-ui/react";
 import useShowToast from "../hooks/useShowToast";
 import { useState } from "react";
 import axios from "axios";
@@ -12,6 +12,8 @@ const CreateTeam = ({ setCreateTeam }) => {
   const { isLoading, setLoading } = useLoading();
   const [teamName, setTeamName] = useState("");
   const dispatch = useDispatch();
+  const { colorMode } = useColorMode();
+
   const navigate = useNavigate();
   const createNewTeam = async () => {
     if (isLoading) return;
@@ -40,7 +42,12 @@ const CreateTeam = ({ setCreateTeam }) => {
   };
   return (
     <div className=" px-6 md:px-16 my-16">
-      <Image src="/logo.png" alt="logo" width={100} height={50} />
+      <Image
+        src={`${colorMode === "dark" ? "/logo2.png" : "/logo.png"}`}
+        alt="logo"
+        width={200}
+        height={70}
+      />
       <div className="flex flex-col items-center mt-8">
         <h2 className="text-center font-bold text-[40px] py-3">
           What should we call your team?

@@ -70,7 +70,7 @@ const loginUser = async (req, res) => {
 };
 
 const updateProfile = async (req, res) => {
-  const { name, email, password, userName, bio } = req.body.inputs;
+  const { name, email, password, userName } = req.body.inputs;
   const userId = req.user._id;
   let { profilePic } = req.body.inputs;
   try {

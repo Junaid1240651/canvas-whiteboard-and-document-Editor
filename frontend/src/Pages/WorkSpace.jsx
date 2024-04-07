@@ -32,7 +32,10 @@ const Workspace = () => {
   const user = useSelector((state) => state.auth.userInfo);
   const [fileData, setFileData] = useState();
   const dispatch = useDispatch();
-  const [screenType, setScreenType] = useState("both");
+  const [screenType, setScreenType] = useState(
+    localStorage.getItem("screenType") || "both"
+  );
+
   const useToast = useShowToast();
   const { fileId } = useParams();
   const getFileData = async () => {
@@ -49,7 +52,7 @@ const Workspace = () => {
       }
     } catch (error) {
       useToast("Error", error.response.data.message, "error");
-
+      setFileData(null);
       // If an error occurs during the API request, log the error and display a toast message
     } finally {
       // Set loading state to false once the request is complete, regardless of success or failure
@@ -77,7 +80,6 @@ const Workspace = () => {
       useToast("Success", res.data.message, "success");
     } catch (error) {
       setFileData(null);
-
       useToast("Error", error.response.data.message, "error");
     } finally {
       setLoading(false);
@@ -96,7 +98,6 @@ const Workspace = () => {
   };
 
   function getDocData(document) {
-    console.log(document);
     setDocumentData((prevData) => ({ ...prevData, document }));
   }
   function getCanvasData(canvasData) {
@@ -110,12 +111,12 @@ const Workspace = () => {
       onSaveDocument();
     }
   }, [documentData, whiteBoardData]);
-
+  useEffect(() => {
+    localStorage.setItem("screenType", screenType);
+  }, [screenType]);
   useEffect(() => {
     getFileData();
   }, [fileId]);
-  console.log(whiteBoardData);
-
   if (!fileData?.canvas && !fileData?.document)
     return fileData === null ? (
       <Text className=" text-2xl flex justify-center   h-[100vh] items-center w-full">

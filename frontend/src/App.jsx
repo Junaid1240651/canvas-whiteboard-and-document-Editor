@@ -49,7 +49,7 @@ function App() {
         />
         <Route
           path="/auth"
-          element={!user ? <AuthPage /> : <Navigate to="/" />}
+          element={!user ? <AuthPage /> : <Navigate to="/dashboard" />}
         />
       </Routes>
     </Suspense>

@@ -16,6 +16,7 @@ import {
   Progress,
   useColorModeValue,
   Avatar,
+  useColorMode,
   CircularProgress,
 } from "@chakra-ui/react";
 import { IoFlagOutline } from "react-icons/io5";
@@ -29,7 +30,7 @@ import { AiOutlineGithub } from "react-icons/ai";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import useShowToast from "../hooks/useShowToast";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import CreateFile from "./CreateFile";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedTeam } from "../redux/team";
@@ -38,6 +39,8 @@ import LoadingScreen from "./LoadingScreen/LoadingScreen";
 import useGetUserData from "../hooks/useGetUserData";
 import useLogout from "../hooks/useLogout";
 const SideNavBar = () => {
+  const { colorMode } = useColorMode();
+
   const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const selectedTeam = useSelector((state) => state.team.selectedTeam);
@@ -96,7 +99,12 @@ const SideNavBar = () => {
       >
         <Box className=" flex-1 flex-col justify-center">
           <Flex className=" flex justify-center">
-            <Image src="/logo.png" w={100} h={10} my={3} mt={4} />
+            <Image
+              src={`${colorMode === "dark" ? "/logo2.png" : "/logo.png"}`}
+              w={"150px"}
+              h={"50px"}
+              mt={"17.5px"}
+            />
           </Flex>
           <Divider height={"1.4px"} className="bg-gray-500" mt={2} />
 
@@ -131,6 +139,7 @@ const SideNavBar = () => {
               <Divider height={"1.4px"} className="bg-gray-500" mt={2} />
               <MenuList mx={3} shadow={"none"} border={"none"}>
                 <MenuItem
+                  className={`flex hover:bg-blue-600 hover:text-white hover:rounded-[6px]`}
                   rounded={4}
                   gap={2}
                   px={2}
@@ -140,11 +149,21 @@ const SideNavBar = () => {
                   Create Team
                 </MenuItem>
 
-                <MenuItem gap={2} px={2} onClick={() => navigate("/profile")}>
+                <MenuItem
+                  className={`flex hover:bg-blue-600 hover:text-white hover:rounded-[6px]`}
+                  gap={2}
+                  px={2}
+                  onClick={() => navigate("/profile")}
+                >
                   <IoSettingsOutline gap={2} />
                   Settings
                 </MenuItem>
-                <MenuItem gap={2} px={2} onClick={logout}>
+                <MenuItem
+                  gap={2}
+                  className={`flex hover:bg-blue-600 hover:text-white hover:rounded-[6px]`}
+                  px={2}
+                  onClick={logout}
+                >
                   <MdOutlineLogout />
                   Logout
                 </MenuItem>
@@ -184,30 +203,33 @@ const SideNavBar = () => {
             gap={2}
             p={2}
             alignItems={"center"}
-            className="flex hover:bg-gray-200  hover:rounded-[6px]"
+            className={`flex hover:bg-blue-600 hover:text-white hover:rounded-[6px]`}
             cursor={"pointer"}
           >
             <IoFlagOutline />
             Getting Start
           </Text>
+          <Link to="https://github.com/Junaid1240651">
+            <Text
+              width={"100%"}
+              gap={2}
+              p={2}
+              alignItems={"center"}
+              className={`flex hover:bg-blue-600 hover:text-white hover:rounded-[6px]`}
+              cursor={"pointer"}
+            >
+              {" "}
+              <AiOutlineGithub />
+              Github
+            </Text>
+          </Link>
+
           <Text
             width={"100%"}
             gap={2}
             p={2}
             alignItems={"center"}
-            className="flex hover:bg-gray-200  hover:rounded-[6px]"
-            cursor={"pointer"}
-          >
-            {" "}
-            <AiOutlineGithub />
-            Github
-          </Text>
-          <Text
-            width={"100%"}
-            gap={2}
-            p={2}
-            alignItems={"center"}
-            className="flex hover:bg-gray-200  hover:rounded-[6px]"
+            className={`flex hover:bg-blue-600 hover:text-white hover:rounded-[6px]`}
             cursor={"pointer"}
             mb={3}
             onClick={archiveHandler}

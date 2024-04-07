@@ -19,6 +19,7 @@ const userSocketMap = {}; // userId: socketId
 let previousCanvasData = null;
 let previousDocument = null;
 let previousData = null;
+let previousFileData = null;
 
 io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId;
@@ -29,21 +30,33 @@ io.on("connection", (socket) => {
 
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
   console.log(userSocketMap);
-  const debounceEmitCanvas = _.debounce(({ document, canvas, _id, fileId }) => {
-    // Emit the canvas event to all clients
-    io.emit("canvas", { document, canvas, _id, fileId });
-    // Update the previousCanvasData to the current canvas data
-    previousCanvasData = canvas;
-  }, 100);
+  const debounceEmitCanvas = _.debounce(
+    ({ document, canvas, _id, fileId, fileData }) => {
+      // Emit the canvas event to all clients
+      io.emit("canvas", { document, canvas, _id, fileId, fileData });
+      // Update the previousCanvasData to the current canvas data
+      previousCanvasData = canvas;
+      previousFileData = fileData;
+    },
+    200
+  );
 
-  socket.on("canvas", async ({ canvas, _id, fileId }) => {
+  socket.on("canvas", async ({ canvas, _id, fileId, fileData }) => {
     try {
-      // Check if the canvas data has changed since the last emission
-      if (JSON.stringify(canvas) !== JSON.stringify(previousCanvasData)) {
-        // Update the previousCanvasData to the current canvas data
-        // console.log(canvas);
-        debounceEmitCanvas({ canvas, _id, fileId });
+      if (canvas) {
+        if (JSON.stringify(canvas) !== JSON.stringify(previousCanvasData)) {
+          // Update the previousCanvasData to the current canvas data
+          // console.log(canvas);
+          debounceEmitCanvas({ canvas, _id, fileId, fileData });
+        }
+      } else {
+        if (JSON.stringify(fileData) !== JSON.stringify(previousFileData)) {
+          // Update the previousCanvasData to the current canvas data
+          // console.log(canvas);
+          debounceEmitCanvas({ canvas, _id, fileId, fileData });
+        }
       }
+      // Check if the canvas data has changed since the last emission
     } catch (error) {
       console.log(error);
     }
@@ -61,22 +74,6 @@ io.on("connection", (socket) => {
       console.log(error);
     }
   });
-
-  // socket.on("markMessagesAsSeen", async ({ conversationId, userId }) => {
-  //   try {
-  //     await Message.updateMany(
-  //       { conversationId: conversationId, seen: false },
-  //       { $set: { seen: true } }
-  //     );
-  //     await Conversation.updateOne(
-  //       { _id: conversationId },
-  //       { $set: { "lastMessage.seen": true } }
-  //     );
-  //     io.to(userSocketMap[userId]).emit("messagesSeen", { conversationId });
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // });
 
   socket.on("disconnect", () => {
     console.log("disconnected");
