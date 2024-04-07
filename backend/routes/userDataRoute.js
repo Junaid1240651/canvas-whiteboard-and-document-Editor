@@ -3,14 +3,12 @@ const {
   createFile,
   createTeam,
   saveDocument,
-
   deleteFile,
   updateFile,
   duplicateFile,
   getUserData,
   archiveFile,
   unArchive,
-
   getFileData,
   grantAccess,
 } = require("../controllers/userDataController");
@@ -31,6 +29,5 @@ router.post("/createFile", proctedRoute, createFile);
 router.post("/updateFile/:fileId", proctedRoute, updateFile);
 
 router.delete("/deleteFile/:fileId", proctedRoute, deleteFile);
-// router.post("/saveCanvas/:fileId", proctedRoute, saveCanvas);
 
 module.exports = router;

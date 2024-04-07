@@ -7,7 +7,7 @@ import useLoading from "../hooks/useLoading";
 import { useDispatch } from "react-redux";
 import { setSelectedTeam } from "../redux/team";
 
-const CreateTeam = ({ setCreateTeam }) => {
+const CreateTeam = () => {
   const useToast = useShowToast();
   const { isLoading, setLoading } = useLoading();
   const [teamName, setTeamName] = useState("");

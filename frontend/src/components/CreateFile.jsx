@@ -6,18 +6,16 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
-  Text,
   ModalCloseButton,
   useDisclosure,
   Input,
-  useColorMode,
 } from "@chakra-ui/react";
 import useShowToast from "../hooks/useShowToast";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import useLoading from "./../hooks/useLoading";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import useGetUserData from "../hooks/useGetUserData";
 
 const CreateFile = ({
@@ -35,7 +33,6 @@ const CreateFile = ({
   const selectedTeam = useSelector((state) => state.team.selectedTeam);
   const showToast = useShowToast();
   const getUserData = useGetUserData();
-  const userData = useSelector((state) => state.user.userData);
 
   const createFile = async () => {
     if (isLoading) return;

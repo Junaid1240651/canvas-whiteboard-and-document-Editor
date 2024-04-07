@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { useEffect } from "react";
 import SideNavBar from "../components/SideNavBar";
-import DashboardNavbar from "../components/DashboardNavbar";
+import DashboardRight from "../components/Dashboard";
 import { Flex } from "@chakra-ui/react";
 import { useSelector } from "react-redux";
 import LoadingScreen from "../components/LoadingScreen/LoadingScreen";
@@ -22,7 +22,7 @@ const Dashboard = () => {
           <SideNavBar s />
 
           <Flex className="justify-end  bg-slate-200">
-            <DashboardNavbar />
+            <DashboardRight />
           </Flex>
         </Flex>
       ) : (

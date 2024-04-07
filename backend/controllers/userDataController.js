@@ -7,8 +7,6 @@ const saveDocument = async (req, res) => {
   const { _id } = req.user;
   const { document, canvas } = req.body;
   const { fileId } = req.params;
-  console.log("abt");
-  console.log(canvas?.whiteBoardData);
   try {
     let userData = await UserData.findOne({ userId: _id });
     let fileExistIndex = userData?.file?.findIndex(
@@ -72,7 +70,6 @@ const saveDocument = async (req, res) => {
       userData._id,
       document
     );
-    console.log(userData._id);
     res.status(200).json({ message: "Document saved successfully", userData });
   } catch (error) {
     console.error("Error in saving document:", error);
@@ -91,11 +88,9 @@ const saveDocument2 = async (userData, fileExistIndex, _id, document) => {
 
     // Save the updated user data
     await user.save();
-    // console.log(user.file[fileExistIndex].document[0].blocks.length);
 
     return;
   } catch (error) {
-    console.log("Error in saving document:", error);
     return error;
   }
 };
@@ -107,7 +102,6 @@ const deleteCloudinaryImages = async (canvasData) => {
     await Promise.all(
       Object.values(canvasData[0].imageData).map(async (imageDataItem) => {
         if (isCloudinaryUrl(imageDataItem.dataURL)) return;
-        console.log("abt");
         await cloudinary.uploader.destroy(
           imageDataItem.dataURL.split("/").pop().split(".")[0]
         );
@@ -139,17 +133,6 @@ const uploadImagesToCloudinary = async (canvasData) => {
 };
 
 const isCloudinaryUrl = async (url) => {
-  // if (!url.includes("cloudinary.com")) {
-  //   // console.log(url);
-  // } else {
-  // }
-  // cloudinary.uploader
-  //   .upload(url, {
-  //     moderation: "duplicate:0.8",
-  //     // notification_url: "https://mysite.example.com/hooks",
-  //   })
-  //   .then((result) => console.log(result))
-  //   .catch((error) => console.log(error));
   return url.includes("cloudinary.com");
 };
 
@@ -178,7 +161,6 @@ const createTeam = async (req, res) => {
       .status(200)
       .json({ message: "Team created successfully", team: newTeam });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Error in saving team" });
   }
 };
@@ -443,11 +425,6 @@ const grantAccess = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
-// // Function to validate email format
-// const isValidEmail = (email) => {
-//   // Implement your email validation logic here
-// };
 
 module.exports = {
   createFile,

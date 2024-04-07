@@ -3,10 +3,6 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
-  MenuItemOption,
-  MenuGroup,
-  MenuOptionGroup,
-  MenuDivider,
   Button,
   Flex,
   Image,
@@ -15,9 +11,7 @@ import {
   Box,
   Progress,
   useColorModeValue,
-  Avatar,
   useColorMode,
-  CircularProgress,
 } from "@chakra-ui/react";
 import { IoFlagOutline } from "react-icons/io5";
 import { FiGrid } from "react-icons/fi";
@@ -28,15 +22,11 @@ import { AiOutlineTeam } from "react-icons/ai";
 import { FiArchive } from "react-icons/fi";
 import { AiOutlineGithub } from "react-icons/ai";
 import { useEffect, useState } from "react";
-import axios from "axios";
-import useShowToast from "../hooks/useShowToast";
 import { Link, useNavigate } from "react-router-dom";
 import CreateFile from "./CreateFile";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedTeam } from "../redux/team";
 import { setFileModelOpen } from "../redux/file";
-import LoadingScreen from "./LoadingScreen/LoadingScreen";
-import useGetUserData from "../hooks/useGetUserData";
 import useLogout from "../hooks/useLogout";
 const SideNavBar = () => {
   const { colorMode } = useColorMode();
@@ -184,7 +174,6 @@ const SideNavBar = () => {
               </Flex>
             </MenuList>
           </Menu>
-          {/* <Divider className="w-[100vh] mb-6 h-[0.5px] bg-slate-400" /> */}
           <Flex className="flex justify-center m-[18px] mt-1">
             <Button
               onClick={() => allFileHandler()}
@@ -255,8 +244,6 @@ const SideNavBar = () => {
             />
           )}
           <Progress
-            // className="bg-blue-750"
-            // backgroundColor={"red"}
             colorScheme="red"
             bgColor={"#2866df"}
             mb={3}

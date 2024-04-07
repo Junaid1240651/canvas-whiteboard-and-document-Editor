@@ -42,7 +42,6 @@ const SignUp = () => {
     try {
       const generator = new AvatarGenerator();
 
-      // Simply get a random avatar
       const avatar = generator.generateRandomAvatar();
       inputs.profilePic = avatar;
 

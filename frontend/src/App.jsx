@@ -1,22 +1,19 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import { Suspense, lazy, useEffect, useState } from "react"; // Import Suspense and lazy
+import { Suspense, lazy, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import HomePage from "./Pages/HomePage";
 
-const AuthPage = lazy(() => import("./Pages/AuthPage")); // Lazy load AuthPage
-const CreateTeam = lazy(() => import("./Pages/CreateTeam")); // Lazy load CreateTeam
-const Dashboard = lazy(() => import("./Pages/Dashboard")); // Lazy load Dashboard
-const Workspace = lazy(() => import("./Pages/WorkSpace")); // Lazy load Workspace
+const AuthPage = lazy(() => import("./Pages/AuthPage"));
+const CreateTeam = lazy(() => import("./Pages/CreateTeam"));
+const Dashboard = lazy(() => import("./Pages/Dashboard"));
+const Workspace = lazy(() => import("./Pages/WorkSpace"));
 import LoadingScreen from "./components/LoadingScreen/LoadingScreen";
 import UpdateProfilePage from "./Pages/UpdateProfilePage";
 import setupSocket from "./socketio/socketio";
 import { setSocket } from "./redux/socketio";
-import { io } from "socket.io-client";
 
 function App() {
   const user = useSelector((state) => state.auth.userInfo);
-  const socket = useSelector((state) => state.socketio.socket);
-  const onlineUser = useSelector((state) => state.socketio.onlineUsers);
   const dispatch = useDispatch();
   useEffect(() => {
     const socket = user ? setupSocket(user._id, dispatch) : null;
@@ -28,7 +25,6 @@ function App() {
     }
   }, [user]);
 
-  // console.log(onlineUser);
   return (
     <Suspense fallback={<LoadingScreen />}>
       <Routes>

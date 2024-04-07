@@ -1,4 +1,5 @@
 require("dotenv").config();
+const path = require("path");
 const express = require("express");
 const connectDb = require("./db/connectDB.js");
 const cookieParser = require("cookie-parser");
@@ -23,6 +24,20 @@ app.use(cookieParser());
 // Routes
 app.use("/api/users", userRoutes);
 app.use("/api/userData", userDataRoutes);
+app.use((req, res, next) => {
+  res.setHeader(
+    "Content-Security-Policy",
+    "font-src 'self' https://fonts.gstatic.com"
+  );
+  next();
+});
+
+app.use(express.static(path.join(__dirname, "../frontend/dist")));
+
+// react app
+app.get("/*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "../frontend", "dist", "index.html"));
+});
 
 server.listen(PORT, () => {
   console.log("listening on 3000");

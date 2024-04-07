@@ -12,7 +12,6 @@ const fileSlice = createSlice({
       state.fileName = action.payload;
     },
     setFileModelOpen: (state, action) => {
-      console.log(action.payload);
       state.fileModelOpen = action.payload;
     },
   },

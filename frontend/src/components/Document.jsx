@@ -1,5 +1,4 @@
-import { Box } from "@chakra-ui/react";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import EditorJS from "@editorjs/editorjs";
 import Header from "@editorjs/header";
 import List from "@editorjs/list";
@@ -11,14 +10,11 @@ import Embed from "@editorjs/embed";
 import Quote from "@editorjs/quote";
 import Paragraph from "@editorjs/paragraph";
 import Warning from "@editorjs/warning";
-import axios from "axios";
-import useShowToast from "../hooks/useShowToast";
 import { useParams } from "react-router-dom";
 import { useColorMode } from "@chakra-ui/react";
 import useLoading from "../hooks/useLoading";
 import { useDispatch, useSelector } from "react-redux";
 import { setSaveDocClick } from "../redux/team";
-import LoadingScreen from "./LoadingScreen/LoadingScreen";
 const rawDocument = {
   time: 1550476186479,
   blocks: [
@@ -116,7 +112,6 @@ const Document = ({ setDocData, fileData }) => {
   const onSaveDocument = async () => {
     if (editorRef.current) {
       const saveData = await editorRef.current.save();
-      console.log(saveData);
       setDocData([saveData]);
     }
   };
@@ -124,7 +119,6 @@ const Document = ({ setDocData, fileData }) => {
   useEffect(() => {
     saveDocClick && onSaveDocument();
     saveDocClick && dispatch(setSaveDocClick(false));
-    console.log("fgsdfg");
   }, [saveDocClick]);
 
   useEffect(() => {
@@ -158,7 +152,7 @@ const Document = ({ setDocData, fileData }) => {
 
   useEffect(() => {
     socket?.on("document", (message) => {
-      console.log(message.document);
+      message.document;
       if (user?._id !== message._id) {
         const receivedDocumentData = message.document;
 

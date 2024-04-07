@@ -1,5 +1,5 @@
 import { io } from "socket.io-client";
-import { setOnlineUsers, setSocket } from "../redux/socketio";
+import { setSocket } from "../redux/socketio";
 
 const setupSocket = (userId, dispatch) => {
   try {
@@ -10,12 +10,7 @@ const setupSocket = (userId, dispatch) => {
     });
 
     socket.on("connect", () => {
-      // console.log("Connected to server");
       dispatch(setSocket(socket));
-    });
-
-    socket.on("getOnlineUsers", (users) => {
-      dispatch(setOnlineUsers(users));
     });
 
     socket.on("disconnect", () => {
@@ -24,8 +19,6 @@ const setupSocket = (userId, dispatch) => {
 
     return socket;
   } catch (error) {
-    console.log(error);
-    console.error("Error connecting to server:", error);
     return null;
   }
 };

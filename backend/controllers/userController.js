@@ -80,7 +80,6 @@ const updateProfile = async (req, res) => {
     }
 
     if (password) {
-      console.log(password);
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(password, salt);
       user.password = hashedPassword;
@@ -91,18 +90,13 @@ const updateProfile = async (req, res) => {
     }
 
     if (profilePic) {
-      console.log(1);
       if (user.profilePic) {
-        console.log(2);
-
         await cloudinary.uploader.destroy(
           user.profilePic.split("/").pop().split(".")[0]
         );
       }
-      console.log(3);
 
       const uploadedResponse = await cloudinary.uploader.upload(profilePic);
-      console.log(4);
 
       profilePic = uploadedResponse.secure_url;
     }
@@ -113,13 +107,11 @@ const updateProfile = async (req, res) => {
     user.profilePic = profilePic || user.profilePic;
     user = await user.save();
     user.password = null;
-    console.log(user);
 
     return res
       .status(200)
       .json({ message: "User profile Update Successfully", user });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Error in updating profile" });
   }
 };
@@ -130,7 +122,6 @@ const logoutUser = async (req, res) => {
     res.status(200).json({ error: "User logged out successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
-    console.log("Error in signupUser: ", err.message);
   }
 };
 

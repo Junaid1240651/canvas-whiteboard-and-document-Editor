@@ -1,10 +1,7 @@
 import { Excalidraw, MainMenu, WelcomeScreen } from "@excalidraw/excalidraw";
 import { useColorMode } from "@chakra-ui/react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import useShowToast from "../hooks/useShowToast";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
-import useLoading from "../hooks/useLoading";
 import { useDispatch, useSelector } from "react-redux";
 import { setSaveCanvasClick } from "../redux/team";
 import LoadingScreen from "./LoadingScreen/LoadingScreen";
@@ -29,7 +26,6 @@ const Canvas = ({ setCanvasData, fileData }) => {
   const saveCanvasClick = useSelector((state) => state.team.saveCanvasClick);
   useEffect(() => {
     if (saveCanvasClick && whiteBoardData !== null) {
-      console.log(whiteBoardData);
       setCanvasData({ whiteBoardData: whiteBoardData2, imageData });
       dispatch(setSaveCanvasClick(false));
     }
@@ -49,7 +45,6 @@ const Canvas = ({ setCanvasData, fileData }) => {
 
   const prevWhiteBoardData = useRef(null);
 
-  // Function to log the previous and current whiteBoardData
   const logData = async (prevData, currentData) => {
     const sceneData = {
       elements: currentData.map((element) => element),
@@ -60,9 +55,7 @@ const Canvas = ({ setCanvasData, fileData }) => {
   };
 
   useEffect(() => {
-    // Call the logData function after whiteBoardData is updated
     logData(prevWhiteBoardData.current, whiteBoardData);
-    // Store the current whiteBoardData as the previous value
     prevWhiteBoardData.current = whiteBoardData;
   }, [whiteBoardData]);
   useEffect(() => {
@@ -71,8 +64,6 @@ const Canvas = ({ setCanvasData, fileData }) => {
         setIsRemoteChange(false);
 
         const receivedCanvasData = message.canvas;
-        const receivedFileData = message.fileData;
-        console.log(receivedFileData, "receivedFileData");
 
         if (
           JSON.stringify(receivedCanvasData) !==
@@ -80,19 +71,14 @@ const Canvas = ({ setCanvasData, fileData }) => {
           whiteBoardData?.length <= receivedCanvasData?.length
         ) {
           setWhiteBoardData(receivedCanvasData);
-
-          // Update the whiteBoardData state
         }
       }
     });
 
-    // After whiteBoardData is updated, update the scene using excalidrawAPI
-
     return () => {
-      socket.off("canvas"); // Clean up socket listener on unmount
+      socket.off("canvas");
     };
   }, [socket]);
-  console.log(imageData);
   if (!fileData) return <LoadingScreen />;
   return (
     <>
@@ -108,7 +94,6 @@ const Canvas = ({ setCanvasData, fileData }) => {
         onChange={(excalidrawElements, appState, files) => {
           setWhiteBoardData2(excalidrawElements);
           if (isRemoteChange === true) {
-            // Only emit changes if they are not caused by remote users
             setTimeout(() => {
               setImageData(files);
               socket.emit("canvas", {

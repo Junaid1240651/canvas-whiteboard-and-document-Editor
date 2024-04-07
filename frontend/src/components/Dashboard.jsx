@@ -27,7 +27,7 @@ import { formatDistanceToNow } from "date-fns";
 
 import { IoIosLink, IoMdMore } from "react-icons/io";
 
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ColorModeToggle from "./ColorModeToggle";
 import { GoDuplicate } from "react-icons/go";
 import {
@@ -46,7 +46,7 @@ import useGetUserData from "../hooks/useGetUserData";
 import { setSelectedTeam } from "../redux/team";
 import { CgProfile } from "react-icons/cg";
 import useLogout from "../hooks/useLogout";
-const DashboardNavbar = ({}) => {
+const Dashboard = () => {
   const [renameFile, setRenameFile] = useState(null);
   const [grantAccess, setGrantAccess] = useState(null);
   const user = useSelector((state) => state.auth.userInfo);
@@ -125,14 +125,12 @@ const DashboardNavbar = ({}) => {
   };
   const recentFileHandler = () => {
     if (!userData || !userData.file) {
-      console.log("userData or userData.file is null or undefined");
       return;
     }
 
     const selectedTeamId = selectedTeam.team?._id;
 
     if (!selectedTeamId) {
-      console.log("Selected team ID is null or undefined");
       return;
     }
 
@@ -245,7 +243,7 @@ const DashboardNavbar = ({}) => {
               rounded={"5px"}
               border={"1.5px solid #64748B"}
               onChange={searchFilter}
-              // leftIcon={<AddIcon />}
+              leftIcon={<AddIcon />}
             />
 
             <Menu>
@@ -438,4 +436,4 @@ const DashboardNavbar = ({}) => {
   );
 };
 
-export default DashboardNavbar;
+export default Dashboard;
