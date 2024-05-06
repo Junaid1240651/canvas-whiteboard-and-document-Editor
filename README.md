@@ -71,8 +71,6 @@ But that's not all - our document editor takes collaboration to the next level. 
 
 And here's the best part - TeamCollab's automatic saving feature ensures that your work is always secure and up-to-date. When one user clicks on "Save File Changes," the updates are automatically saved for all whiteList users, no need for others to manually save. Even if three users haven't clicked on "Save File Changes," they'll still see the latest changes once they refresh the page, ensuring seamless collaboration without any hassle.
 
-i will release the Live Project link soon
-
 Thanks You 
 Junaid Khan
 Email: jk1240651@gmail.com
