@@ -74,7 +74,7 @@ const Dashboard = () => {
   };
   const copyURL = (fileId) => {
     navigator.clipboard
-      .writeText("http://localhost:3001/workspace/" + fileId)
+      .writeText("https://canvas-whiteboard-and-document-editor.onrender.com/workspace/" + fileId)
       .then(() => {
         showToast("Success", "File link copied", "success");
       });
